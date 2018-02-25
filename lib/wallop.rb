@@ -26,7 +26,7 @@ module Wallop
   end
   
   def self.ffmpeg_command(channel,resolution='1280x720',bitrate='3000k')
-	cvlc http://192.168.1.2:5004/auto/v{channel} --sout '#transcode{vcodec=h264,vb=512,acodec=mp3,ab=64,samplerate=44100}:std{access=livehttp{seglen=5,delsegs=true,numsegs=5,index=#{transcoding_path}/#{channel}.m3u8,index-url=http://dbm-media.home:8888/channels/{channel}-########.ts},mux=ts{use-key-frames},dst=/home/dbmiller/new/wallop/tmp/{channel}-########.ts}'
+    %{exec cvlc http://192.168.1.2:5004/auto/v#{channel} --sout '#transcode{vcodec=h264,vb=512,acodec=mp3,ab=64,samplerate=44100}:std{access=livehttp{seglen=5,delsegs=true,numsegs=5,index=#{transcoding_path}/#{channel}.m3u8,index-url=http://dbm-media.home:8888/channels/#{channel}-########.ts},mux=ts{use-key-frames},dst=/home/dbmiller/new/wallop/tmp/#{channel}-########.ts}'}
   end
 
   def self.ffmpeg_no_transcode_command(channel, profile='mobile')
