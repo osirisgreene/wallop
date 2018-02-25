@@ -24,10 +24,9 @@ module Wallop
   def self.config
     @config ||= TOML.load_file(File.join(RACK_ROOT, 'config', 'config.toml'))
   end
-
-  def self.ffmpeg_command(channel, resolution='1280x720', bitrate='3000k')
-    audio_options = config['ffmpeg']['acodec'] == 'copy' ? '-acodec copy' : "-ac #{config['ffmpeg']['ac']} -acodec #{config['ffmpeg']['acodec']}"
-    %{exec #{config['ffmpeg_path']} -threads #{config['ffmpeg']['threads']} -f mpegts -analyzeduration 2000000 -i #{raw_stream_url_for_channel(channel)} #{audio_options} -b:v #{bitrate} -bufsize #{bitrate.to_i*2}k -minrate #{bitrate.gsub(/\d+/){ |o| (o.to_i * 0.80).to_i }} -maxrate #{bitrate} -vcodec #{config['ffmpeg']['vcodec']} -s #{resolution} -preset #{config['ffmpeg']['h264_preset']} -r #{config['ffmpeg']['framerate']} -hls_time #{config['ffmpeg']['hls_time']} -hls_wrap #{config['ffmpeg']['hls_wrap']} #{config['ffmpeg']['options']} #{transcoding_path}/#{channel}.m3u8 >log/ffmpeg.log 2>&1}
+  
+  def self.ffmpeg_command(channel,resolution='1280x720',bitrate='3000k')
+	cvlc http://192.168.1.2:5004/auto/v{channel} --sout '#transcode{vcodec=h264,vb=512,acodec=mp3,ab=64,samplerate=44100}:std{access=livehttp{seglen=5,delsegs=true,numsegs=5,index=#{transcoding_path}/#{channel}.m3u8,index-url=http://dbm-media.home:8888/channels/{channel}-########.ts},mux=ts{use-key-frames},dst=/home/dbmiller/new/wallop/tmp/{channel}-########.ts}'
   end
 
   def self.ffmpeg_no_transcode_command(channel, profile='mobile')
